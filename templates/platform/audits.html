@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<h1>Audit Intelligence</h1>
+
+<div class="card" style="background:#0f172a; color:#38bdf8; font-family:'Courier New', monospace; margin-top:30px;">
+    
+    {% for log in logs %}
+        <p style="margin-bottom: 8px;">
+            <span style="color:#64748b;">
+                [{{ log.timestamp|date:"Y-m-d H:i:s" }}]
+            </span>
+            <span style="color:#fbbf24;">
+                {{ log.user.username|default:"System" }}
+            </span> :
+            {{ log.action }}
+        </p>
+    {% empty %}
+        <p style="color:#64748b;">> No audit records available.</p>
+    {% endfor %}
+    
+</div>
+{% endblock %}

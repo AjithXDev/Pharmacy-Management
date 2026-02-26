@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Provision Administrator | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 550px; margin: 60px auto;">
+    
+    <a href="{% url 'admins_list' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+        <i class="ph-bold ph-arrow-left"></i> Back to Administrators
+    </a>
+
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid var(--border); background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);">
+        
+        <header style="margin-bottom: 32px;">
+            <div style="width: 52px; height: 52px; background: #eff6ff; color: var(--primary); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #dbeafe;">
+                <i class="ph-fill ph-user-plus" style="font-size: 26px;"></i>
+            </div>
+            <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -1px; color: var(--text-main);">Create Admin Identity</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Assign a new administrative node to an existing institution.</p>
+        </header>
+
+        {% if error %}
+        <div style="background: #fef2f2; border: 1px solid #fee2e2; color: #dc2626; padding: 14px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; display: flex; align-items: center; gap: 10px; font-weight: 600;">
+            <i class="ph-bold ph-warning-circle" style="font-size: 18px;"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if hospitals %}
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="modern-label">Admin Username</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="username" placeholder="e.g. admin_apollo" required class="modern-input">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="modern-label">Access Password</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-lock-key" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="password" name="password" placeholder="••••••••" required class="modern-input">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label class="modern-label">Target Institution</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-buildings" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 10;"></i>
+                    <select name="hospital" required class="modern-input" style="appearance: none; cursor: pointer;">
+                        <option value="" disabled selected>-- Select Available Hospital --</option>
+                        {% for hospital in hospitals %}
+                            <option value="{{ hospital.id }}">{{ hospital.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <i class="ph-bold ph-caret-down" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button type="submit" class="btn btn-primary" style="height: 52px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="ph-bold ph-check-circle"></i> Complete Provisioning
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div style="text-align: center; padding: 20px; background: #f8fafc; border-radius: 16px; border: 1px dashed var(--border);">
+            <i class="ph-duotone ph-shield-check" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;"></i>
+            <p style="color: var(--text-muted); font-size: 14px; line-height: 1.5;">
+                All hospitals in the directory already have administrators assigned. Register a new hospital first.
+            </p>
+            <a href="{% url 'add_hospital' %}" style="display: inline-block; margin-top: 16px; color: var(--primary); font-weight: 700; text-decoration: none; font-size: 14px;">
+                + Register New Hospital
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+    .modern-label {
+        display: block; 
+        font-size: 12px; 
+        font-weight: 700; 
+        color: var(--text-muted); 
+        margin-bottom: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 0.5px;
+    }
+
+    .modern-input {
+        width: 100%; 
+        padding: 14px 14px 14px 48px; 
+        border-radius: 12px; 
+        border: 1px solid var(--border); 
+        font-family: inherit; 
+        font-size: 15px; 
+        outline: none; 
+        transition: all 0.2s ease; 
+        background: #fff;
+    }
+
+    .modern-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        background: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25);
+    }
+</style>
+{% endblock %}

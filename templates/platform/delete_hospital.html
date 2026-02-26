@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Deletion | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 520px; margin: 80px auto;">
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid #fee2e2; background: #fff; box-shadow: 0 20px 40px rgba(239, 68, 68, 0.1);">
+        
+        <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 72px; height: 72px; background: #fef2f2; color: #ef4444; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 4px solid #fff; box-shadow: 0 0 0 1px #fee2e2;">
+                <i class="ph-fill ph-warning-octagon" style="font-size: 36px;"></i>
+            </div>
+            
+            <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px;">Institutional Deletion</h2>
+            <p style="color: #64748b; font-size: 15px; margin-top: 10px; line-height: 1.6;">
+                You are about to permanently remove <br>
+                <span style="color: #1e293b; font-weight: 800; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">{{ hospital.name }}</span>
+            </p>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 32px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #ef4444; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="ph-bold ph-shield-warning"></i> Critical Impact
+            </div>
+            <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; display: flex; flex-direction: column; gap: 8px; font-weight: 500;">
+                <li>Revokes all administrative access immediately.</li>
+                <li>Unlinks institutional node from the global directory.</li>
+                <li>This process is <strong style="color: #ef4444;">irreversible</strong>.</li>
+            </ul>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button type="submit" class="btn-destructive-action">
+                    <i class="ph-bold ph-trash"></i> Permanently Delete Node
+                </button>
+                
+                <a href="{% url 'clients_list' %}" class="btn-cancel-action">
+                    Keep Institution
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <p style="text-align: center; margin-top: 24px; font-size: 12px; color: var(--text-muted);">
+        <i class="ph-bold ph-lock"></i> Verification logged by: {{ request.user.username }}
+    </p>
+</div>
+
+<style>
+    .btn-destructive-action {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-destructive-action:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-cancel-action {
+        text-align: center;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel-action:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+</style>
+{% endblock %}

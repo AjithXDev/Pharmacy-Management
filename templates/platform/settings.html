@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Platform Settings</h1>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 30px;">
+    <div class="card">
+        <h3>Security Configuration</h3>
+        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span>Two-Factor Auth</span>
+            <span style="color: var(--primary); font-weight: 800;">ENABLED</span>
+        </div>
+    </div>
+    <div class="card">
+        <h3>API Control</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin: 10px 0;">Manage hospital integration keys.</p>
+        <button class="btn btn-primary" style="width: 100%;">Generate New Key</button>
+    </div>
+</div>
+{% endblock %}

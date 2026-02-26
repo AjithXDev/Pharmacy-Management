@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Client Management{% endblock %}
+
+{% block content %}
+<header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
+    <div>
+        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.2px; color: var(--text-main);">Hospital Clients</h1>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+            Institutional registry and operational nodes managed by AIOHOS.
+        </p>
+    </div>
+
+    <a href="{% url 'add_hospital' %}" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);">
+        <i class="ph-bold ph-plus"></i> Register Hospital
+    </a>
+</header>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px;">
+    <form method="GET" style="flex: 1; position: relative; max-width: 500px;">
+        <i class="ph-bold ph-magnifying-glass" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        <input type="text" 
+               name="search" 
+               value="{{ search_query }}" 
+               placeholder="Search by hospital name or location..." 
+               style="width: 100%; padding: 12px 12px 12px 48px; border-radius: 12px; border: 1px solid var(--border); font-family: inherit; outline: none; transition: all 0.2s ease; background: white;">
+        <button type="submit" hidden></button>
+    </form>
+
+    <div style="display: flex; gap: 12px;">
+        <a href="{% url 'export_hospitals' %}" class="btn btn-outline" style="background: white;">
+            <i class="ph-bold ph-export"></i> Export CSV
+        </a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid var(--border); background: white;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <tr>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Organization</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Location</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Primary Admin</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in hospital_data %}
+            <tr class="client-row">
+                <td style="padding: 20px 24px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div class="hospital-avatar">
+                            {{ item.hospital.name|slice:":1" }}
+                        </div>
+                        <span style="font-weight: 700; color: var(--text-main); font-size: 15px;">{{ item.hospital.name }}</span>
+                    </div>
+                </td>
+
+                <td style="padding: 20px 24px; color: var(--text-muted); font-size: 14px;">
+                    <i class="ph-bold ph-map-pin" style="margin-right: 4px;"></i> {{ item.hospital.location }}
+                </td>
+
+                <td style="padding: 20px 24px;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: 600; color: var(--text-main); font-size: 14px;">{{ item.admin_username }}</span>
+                        <span style="font-size: 12px; color: var(--text-muted);">Institutional Admin</span>
+                    </div>
+                </td>
+
+                <td style="padding: 20px 24px; text-align: right;">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <a href="{% url 'edit_hospital' item.hospital.id %}" 
+                           class="icon-action-btn edit" title="Edit Institutional Details">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </a>
+
+                        <a href="{% url 'delete_hospital' item.hospital.id %}" 
+   class="icon-action-btn delete" 
+   title="Delete Hospital">
+    <i class="ph-bold ph-trash"></i>
+</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="padding: 80px 24px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                        <i class="ph-duotone ph-hospital" style="font-size: 64px; color: var(--border);"></i>
+                        <div style="color: var(--text-muted); font-weight: 500;">No hospitals matched your search criteria.</div>
+                        <a href="{% url 'add_hospital' %}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register your first client</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .client-row {
+        border-bottom: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    
+    .client-row:hover {
+        background-color: #f8fafc;
+        transform: scale(1.002);
+        box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    .hospital-avatar {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        color: #475569;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 14px;
+        border: 1px solid var(--border);
+    }
+
+    .icon-action-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border);
+        background: white;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .icon-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .icon-action-btn.edit:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #f0f9ff;
+    }
+
+    .icon-action-btn.delete:hover {
+        border-color: #ef4444;
+        color: #ef4444;
+        background: #fef2f2;
+    }
+
+    input[name="search"]:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1) !important;
+    }
+</style>
+
+{% endblock %}

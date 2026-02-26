@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Add Counter{% endblock %}
+
+{% block content %}
+
+<h2 style="margin-bottom:20px;">
+    Add Counter - {{ pharmacy.name }}
+</h2>
+
+<div class="card">
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Counter Number</label>
+    <input type="number"
+           name="counter_number"
+           required
+           style="padding:10px; width:100%; margin-bottom:20px;">
+
+    <button type="submit" class="btn btn-primary">
+        Create Counter
+    </button>
+</form>
+
+</div>
+
+{% endblock %}

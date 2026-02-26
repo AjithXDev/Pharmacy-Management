@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Prescription</h2>
+
+<p>Patient: {{ prescription.patient.name }}</p>
+
+<p>Total Medicines: {{ prescription.items.count }}</p>
+
+<h3>Medicine List:</h3>
+
+<ul>
+    {% for item in prescription.items.all %}
+        <li>{{ item.medicine.name }} - Qty: {{ item.quantity }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Revoke Access | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 520px; margin: 80px auto;">
+    
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid #fee2e2; background: white; box-shadow: 0 20px 40px rgba(239, 68, 68, 0.08);">
+        
+        <div style="text-align: center; margin-bottom: 28px;">
+            <div style="width: 72px; height: 72px; background: #fff1f2; color: #e11d48; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; transform: rotate(-5deg); border: 1px solid #fecdd3;">
+                <i class="ph-fill ph-user-minus" style="font-size: 32px;"></i>
+            </div>
+            
+            <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.5px;">Revoke Administrator</h2>
+            <p style="color: #64748b; font-size: 15px; margin-top: 10px; line-height: 1.6;">
+                You are about to terminate all system access for <br>
+                <span style="color: #e11d48; font-weight: 800; background: #fff1f2; padding: 2px 8px; border-radius: 6px;">@{{ admin.username }}</span>
+            </p>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin-bottom: 32px;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: #64748b; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="ph-bold ph-shield-warning"></i> Access Impact
+            </div>
+            <ul style="margin: 0; padding-left: 20px; color: #475569; font-size: 13px; display: flex; flex-direction: column; gap: 10px; font-weight: 500;">
+                <li>Login credentials will be <span style="color: #e11d48;">immediately disabled</span>.</li>
+                <li>Associated sessions for <strong>{{ admin.hospital.name }}</strong> will be terminated.</li>
+                <li>Administrative logs will be retained for audit purposes.</li>
+            </ul>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button type="submit" class="btn-revoke-final">
+                    <i class="ph-bold ph-user-minus"></i> Confirm Revocation
+                </button>
+                
+                <a href="{% url 'admins_list' %}" class="btn-cancel-soft">
+                    No, Keep Administrator
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-top: 24px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; color: #94a3b8; font-size: 12px;">
+        <i class="ph-bold ph-lock-key"></i>
+        <span>Authenticated Request by {{ request.user.username }}</span>
+    </div>
+</div>
+
+<style>
+    .btn-revoke-final {
+        background: #e11d48;
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+    }
+
+    .btn-revoke-final:hover {
+        background: #be123c;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(225, 29, 72, 0.35);
+    }
+
+    .btn-cancel-soft {
+        text-align: center;
+        padding: 14px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 14px;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel-soft:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+
+    /* Subtle animation for the card */
+    .card {
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}

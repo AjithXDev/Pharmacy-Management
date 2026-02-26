@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Add Medicine (Master)</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="text" name="name" placeholder="Medicine Name" required><br><br>
+
+    <select name="type">
+        <option value="TABLET">Tablet</option>
+        <option value="SYRUP">Syrup</option>
+        <option value="INJECTION">Injection</option>
+    </select><br><br>
+
+    <label>
+        <input type="checkbox" name="cold_storage">
+        Cold Storage
+    </label><br><br>
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'medicine_list' %}">Back</a>
+
+
+{% endblock %}

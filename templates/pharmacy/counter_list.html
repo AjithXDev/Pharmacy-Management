@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}Counter Management | Live Monitor{% endblock %}
+
+{% block content %}
+<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+    <div>
+        <a href="{% url 'pharmacy_dashboard' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <i class="ph-bold ph-arrow-left"></i> Dashboard Overview
+        </a>
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0;">Dispensary Counters</h1>
+    </div>
+    
+    <div style="text-align: right;">
+        <span id="live-indicator" style="display: inline-flex; align-items: center; gap: 8px; background: #f0fdf4; color: #16a34a; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 800; border: 1px solid #bbf7d0;">
+            <span class="pulse-dot"></span> LIVE MONITORING
+        </span>
+    </div>
+</header>
+
+<div class="card" style="padding: 0; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: white;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <tr>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Counter</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Current Token</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Service Timer</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Operations</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in counter_data %}
+            <tr class="counter-row">
+                <td style="padding: 20px 24px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #475569;">
+                            {{ item.counter.counter_number }}
+                        </div>
+                        <span style="font-weight: 700; color: var(--text-main);">Station {{ item.counter.counter_number }}</span>
+                    </div>
+                </td>
+
+                <td style="padding: 20px 24px;">
+                    {% if item.counter.is_active %}
+                        <span class="badge-status active">Online</span>
+                    {% else %}
+                        <span class="badge-status inactive">Offline</span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 20px 24px;">
+                    {% if item.token %}
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 13px;">
+                                #{{ item.token.token_number }}
+                            </span>
+                        </div>
+                    {% else %}
+                        <span style="color: #cbd5e1; font-size: 13px;">Idle</span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 20px 24px;">
+                    {% if item.token %}
+                        <div class="timer-container">
+                            <i class="ph-bold ph-clock"></i>
+                            <span class="billing-timer" data-start="{{ item.token.billing_start_time|date:'c' }}">--:--</span>
+                        </div>
+                    {% else %}
+                        <span style="color: #cbd5e1;">-</span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 20px 24px; text-align: right;">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <a href="{% url 'toggle_counter' item.counter.id %}" class="btn-op {% if item.counter.is_active %}btn-off{% else %}btn-on{% endif %}" title="Toggle Availability">
+                            <i class="ph-bold ph-power"></i>
+                        </a>
+                        {% if item.token %}
+                            <a href="{% url 'complete_billing' item.token.id %}" class="btn-op btn-finish">
+                                <i class="ph-bold ph-check"></i> Finish
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .counter-row { border-bottom: 1px solid #f1f5f9; transition: 0.2s; }
+    .counter-row:hover { background: #fcfcfc; }
+
+    /* STATUS BADGES */
+    .badge-status { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    .badge-status.active { background: #dcfce7; color: #16a34a; }
+    .badge-status.inactive { background: #f1f5f9; color: #64748b; }
+
+    /* TIMER DESIGN */
+    .timer-container { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-family: 'Courier New', monospace; color: var(--text-main); font-size: 15px; }
+    .timer-overtime { color: #ef4444 !important; animation: blink 1s infinite; }
+
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    /* OPERATION BUTTONS */
+    .btn-op { text-decoration: none; height: 36px; padding: 0 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; transition: 0.2s; border: 1px solid transparent; }
+    .btn-off { color: #ef4444; background: #fef2f2; }
+    .btn-on { color: #16a34a; background: #f0fdf4; }
+    .btn-finish { background: var(--primary); color: white; box-shadow: 0 4px 6px -1px rgba(2,132,199,0.2); }
+    .btn-op:hover { transform: translateY(-1px); filter: brightness(0.95); }
+
+    .pulse-dot { width: 8px; height: 8px; background: #16a34a; border-radius: 50%; animation: pulse-live 1.5s infinite; }
+    @keyframes pulse-live { 0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); } 100% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0); } }
+</style>
+
+<script>
+function updateBillingTimers() {
+    const elements = document.querySelectorAll(".billing-timer");
+    elements.forEach(function(el) {
+        const start = new Date(el.dataset.start);
+        const now = new Date();
+        const diff = now - start;
+        const max = 4 * 60 * 1000; // 4 Minutes
+
+        if (diff >= max) {
+            el.innerHTML = "⚠ Over Time";
+            el.parentElement.classList.add("timer-overtime");
+        } else {
+            const remaining = max - diff;
+            const m = Math.floor(remaining / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
+            el.innerHTML = m + "m " + s + "s";
+            el.parentElement.classList.remove("timer-overtime");
+        }
+    });
+}
+setInterval(updateBillingTimers, 1000);
+updateBillingTimers();
+</script>
+{% endblock %}

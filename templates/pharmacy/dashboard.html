@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}{{ pharmacy.name }} | Dashboard{% endblock %}
+
+{% block content %}
+<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+    <div>
+        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.2px; color: var(--text-main); margin: 0;">{{ pharmacy.name }}</h1>
+        <p style="color: var(--text-muted); font-size: 15px; margin-top: 4px;">Dispensary Control Center & Queue Management</p>
+    </div>
+    
+    <div style="display: flex; gap: 12px;">
+        <a href="{% url 'counter_list' %}" class="btn btn-outline" style="background: white; border-radius: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="ph-bold ph-layout"></i> Manage Counters
+        </a>
+        <a href="{% url 'waiting_list' %}" class="btn btn-primary" style="border-radius: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="ph-bold ph-users-four"></i> View Queue
+        </a>
+    </div>
+</header>
+
+<div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); border-radius: 24px; padding: 32px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 20px 25px -5px rgba(22, 163, 74, 0.15);">
+    <div style="display: flex; align-items: center; gap: 24px;">
+        <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
+            <i class="ph-fill ph-flask"></i>
+        </div>
+        <div>
+            <h3 style="margin: 0; font-size: 22px; font-weight: 800;">Medicine Preparation</h3>
+            <p style="margin: 4px 0 0; opacity: 0.9; font-size: 14px;">Pack and verify medicines for the current active queue.</p>
+        </div>
+    </div>
+    <a href="{% url 'prepare_list' %}" class="prep-btn">
+        Go To Preparation <i class="ph-bold ph-arrow-right"></i>
+    </a>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 40px;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f1f5f9; color: #475569;"><i class="ph-fill ph-columns"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">Total Counters</span>
+            <span class="stat-value">{{ total_counters }}</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #16a34a;"><i class="ph-fill ph-broadcast"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">Active Now</span>
+            <span class="stat-value" style="color: #16a34a;">{{ active_counters }}</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #eff6ff; color: var(--primary);"><i class="ph-fill ph-ticket"></i></div>
+        <div class="stat-info">
+            <span class="stat-label">In Waiting</span>
+            <span class="stat-value">{{ waiting_count }}</span>
+        </div>
+    </div>
+</div>
+
+{% if alerts %}
+<div class="alert-zone">
+    </div>
+{% else %}
+<div class="empty-state">
+    <i class="ph-fill ph-check-circle"></i>
+    <p>All counters are operating within expected time limits.</p>
+</div>
+{% endif %}
+
+<style>
+    /* PREP BUTTON */
+    .prep-btn {
+        background: white; color: #16a34a; padding: 14px 28px; border-radius: 14px;
+        text-decoration: none; font-weight: 800; font-size: 15px; display: flex;
+        align-items: center; gap: 10px; transition: all 0.3s;
+    }
+    .prep-btn:hover { background: #f0fdf4; transform: translateX(5px); }
+
+    /* STAT CARDS */
+    .stat-card {
+        background: white; padding: 24px; border-radius: 20px;
+        border: 1px solid var(--border); display: flex; align-items: center; gap: 20px;
+    }
+    .stat-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .stat-label { display: block; font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 32px; font-weight: 900; color: var(--text-main); }
+
+    .empty-state {
+        background: #f8fafc; border: 2px dashed var(--border); border-radius: 24px; 
+        padding: 40px; text-align: center; color: var(--text-muted);
+    }
+    .empty-state i { font-size: 48px; color: #16a34a; opacity: 0.5; margin-bottom: 12px; display: block; }
+</style>
+{% endblock %}

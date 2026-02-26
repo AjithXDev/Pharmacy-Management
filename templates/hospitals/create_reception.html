@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Create Receptionist | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 550px; margin: 60px auto;">
+    
+    <a href="{% url 'hospital_dashboard' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+        <i class="ph-bold ph-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid var(--border); background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);">
+        
+        <header style="margin-bottom: 32px;">
+            <div style="width: 56px; height: 56px; background: #faf5ff; color: #a855f7; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #f3e8ff;">
+                <i class="ph-fill ph-identification-badge" style="font-size: 28px;"></i>
+            </div>
+            <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -1px; color: var(--text-main); margin: 0;">New Reception Staff</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Register new personnel for front-desk operations and patient intake.</p>
+        </header>
+
+        {% if error %}
+        <div style="background: #fef2f2; border: 1px solid #fee2e2; color: #dc2626; padding: 14px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; display: flex; align-items: center; gap: 10px; font-weight: 600;">
+            <i class="ph-bold ph-warning-circle"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="modern-label">Access Username</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="username" placeholder="e.g. reception_main_01" required class="modern-input">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label class="modern-label">Login Password</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-key" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="password" name="password" placeholder="••••••••••••" required class="modern-input">
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button type="submit" class="btn btn-primary" style="height: 52px; font-size: 16px; font-weight: 700; background: #a855f7; border-color: #a855f7; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);">
+                    <i class="ph-bold ph-user-plus"></i> Initialize Staff Account
+                </button>
+                <p style="text-align: center; font-size: 12px; color: var(--text-muted);">
+                    The staff will be granted permissions for token generation and patient management.
+                </p>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .modern-label {
+        display: block; 
+        font-size: 11px; 
+        font-weight: 800; 
+        color: var(--text-muted); 
+        margin-bottom: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 0.8px;
+    }
+
+    .modern-input {
+        width: 100%; 
+        padding: 14px 14px 14px 48px; 
+        border-radius: 12px; 
+        border: 1px solid var(--border); 
+        font-family: inherit; 
+        font-size: 15px; 
+        outline: none; 
+        transition: all 0.2s ease; 
+        background: #fff;
+        color: var(--text-main);
+    }
+
+    .modern-input:focus {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.1);
+        background: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.1);
+    }
+</style>
+{% endblock %}

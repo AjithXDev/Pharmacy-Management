@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}Medicine Preparation | Live Queue{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 32px;">
+    <a href="{% url 'pharmacy_dashboard' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <i class="ph-bold ph-arrow-left"></i> Back to Dashboard
+    </a>
+    <h1 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin: 0;">Preparation Queue</h1>
+    <p style="color: var(--text-muted); font-size: 14px;">Pack and verify medicines to dispatch tokens for billing.</p>
+</div>
+
+<div class="card" style="padding: 0; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <tr>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Token</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Meds</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Timeline</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Perf Metrics</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Execution</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prep in preparations %}
+            <tr class="prep-row {% if prep.status == 'PREPARING' %}is-active{% endif %}">
+                <td style="padding: 16px 24px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="token-id">#{{ prep.token.token_number }}</span>
+                    </div>
+                </td>
+
+                <td style="padding: 16px 24px;">
+                    <span class="status-badge status-{{ prep.status|lower }}">
+                        {% if prep.status == "PREPARING" %}<span class="spinner-mini"></span>{% endif %}
+                        {{ prep.status }}
+                    </span>
+                </td>
+
+                <td style="padding: 16px 24px;">
+                    <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; color: #475569;">
+                        <i class="ph-bold ph-pill"></i> {{ prep.medicine_count }} Items
+                    </div>
+                </td>
+
+                <td style="padding: 16px 24px;">
+                    <div style="font-size: 13px;">
+                        <div style="color: var(--text-main); font-weight: 600;">
+                            Start: {% if prep.start_time %}{{ prep.start_time|time:"H:i" }}{% else %}-{% endif %}
+                        </div>
+                        <div style="color: #6366f1; font-size: 11px; font-weight: 700; margin-top: 2px;">
+                            Est. Disp: {% if prep.expected_dispatch_time %}{{ prep.expected_dispatch_time|time:"H:i" }}{% else %}-{% endif %}
+                        </div>
+                    </div>
+                </td>
+
+                <td style="padding: 16px 24px;">
+                    {% if prep.actual_prepare_time %}
+                        <div style="display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; color: #16a34a; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                            <i class="ph-bold ph-timer"></i> {{ prep.actual_prepare_time|floatformat:1 }}m
+                        </div>
+                    {% else %}
+                        <span style="color: #cbd5e1;">-</span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 16px 24px; text-align: right;">
+                    {% if prep.status == "PENDING" %}
+                        <a href="{% url 'start_prepare' prep.id %}" class="btn-prep btn-start">
+                            <i class="ph-bold ph-play"></i> Start Packing
+                        </a>
+                    {% elif prep.status == "PREPARING" %}
+                        <a href="{% url 'finish_prepare' prep.id %}" class="btn-prep btn-finish">
+                            <i class="ph-bold ph-check-square"></i> Finish & Notify
+                        </a>
+                    {% else %}
+                        <div style="color: #16a34a; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: flex-end; gap: 6px;">
+                            <i class="ph-bold ph-seal-check"></i> DISPATCHED
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="padding: 60px; text-align: center; color: var(--text-muted);">
+                    <i class="ph-duotone ph-package" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p style="margin-top: 12px; font-weight: 600;">No pending preparations found.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .prep-row { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+    .is-active { background: #f0f9ff !important; border-left: 4px solid var(--primary); }
+
+    .token-id { 
+        background: #0f172a; color: white; padding: 6px 12px; 
+        border-radius: 8px; font-weight: 800; font-size: 14px;
+    }
+
+    /* STATUS BADGES */
+    .status-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-preparing { background: #dbeafe; color: #1e40af; }
+    .status-done { background: #dcfce7; color: #166534; }
+
+    /* ACTION BUTTONS */
+    .btn-prep {
+        text-decoration: none; padding: 10px 18px; border-radius: 10px;
+        font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+        transition: 0.2s;
+    }
+    .btn-start { background: #16a34a; color: white; box-shadow: 0 4px 6px -1px rgba(22,163,74,0.2); }
+    .btn-start:hover { background: #15803d; transform: translateY(-1px); }
+    
+    .btn-finish { background: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2); }
+    .btn-finish:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+    /* SPINNER FOR PREPARING STATE */
+    .spinner-mini {
+        width: 10px; height: 10px; border: 2px solid #1e40af; border-top-color: transparent;
+        border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}

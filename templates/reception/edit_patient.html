@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Update Record | {{ patient.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 40px auto;">
+    
+    <a href="{% url 'reception_dashboard' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+        <i class="ph-bold ph-arrow-left"></i> Discard Changes
+    </a>
+
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid var(--border); background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);">
+        
+        <header style="margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
+            <div style="width: 56px; height: 56px; background: #fff7ed; color: #f59e0b; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #ffedd5;">
+                <i class="ph-fill ph-user-focus" style="font-size: 28px;"></i>
+            </div>
+            <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -1px; color: var(--text-main); margin: 0;">Edit Patient Profile</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Update information for record ID: <strong style="color: var(--primary);">#PT-{{ patient.id }}</strong></p>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 24px;">
+                <label class="modern-label">Patient Full Name</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-identification-card" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="name" value="{{ patient.name }}" required class="modern-input">
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                <div>
+                    <label class="modern-label">Contact Number</label>
+                    <div style="position: relative;">
+                        <i class="ph-bold ph-phone" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input type="text" name="phone" value="{{ patient.phone }}" required class="modern-input">
+                    </div>
+                </div>
+                <div>
+                    <label class="modern-label">Age (Years)</label>
+                    <div style="position: relative;">
+                        <i class="ph-bold ph-calendar-blank" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input type="number" name="age" value="{{ patient.age }}" required class="modern-input">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+                <label class="modern-label">Gender Selection</label>
+                <div style="display: flex; gap: 16px;">
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="Male" {% if patient.gender == "Male" %}checked{% endif %}>
+                        <div class="gender-card">
+                            <i class="ph-bold ph-gender-male"></i>
+                            <span>Male</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="Female" {% if patient.gender == "Female" %}checked{% endif %}>
+                        <div class="gender-card">
+                            <i class="ph-bold ph-gender-female"></i>
+                            <span>Female</span>
+                        </div>
+                    </label>
+                    <label class="gender-option">
+                        <input type="radio" name="gender" value="Other" {% if patient.gender == "Other" %}checked{% endif %}>
+                        <div class="gender-card">
+                            <i class="ph-bold ph-gender-neuter"></i>
+                            <span>Other</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; padding-top: 10px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; height: 56px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 14px;">
+                    <i class="ph-bold ph-floppy-disk-back"></i> Update Profile
+                </button>
+                <a href="{% url 'reception_dashboard' %}" class="btn btn-outline" style="flex: 1; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: white; font-weight: 600;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .modern-label {
+        display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); 
+        margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px;
+    }
+
+    .modern-input {
+        width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; 
+        border: 1px solid var(--border); font-family: inherit; font-size: 15px; 
+        outline: none; transition: all 0.2s ease; background: #fcfcfc;
+    }
+
+    .modern-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        background: white;
+    }
+
+    /* GENDER RADIO STYLING */
+    .gender-option { flex: 1; cursor: pointer; }
+    .gender-option input { display: none; }
+
+    .gender-card {
+        border: 1px solid var(--border); padding: 12px; border-radius: 12px;
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        transition: all 0.2s; color: var(--text-muted); background: #fafafa;
+    }
+
+    .gender-option input:checked + .gender-card {
+        border-color: var(--primary);
+        background: #f0f9ff;
+        color: var(--primary);
+        box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.1);
+    }
+</style>
+{% endblock %}

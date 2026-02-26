@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Remove Patient | {{ patient.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 80px auto;">
+    
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 2px solid #fee2e2; background: white; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.1);">
+        
+        <header style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 80px; height: 80px; background: #fef2f2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 4px solid #fee2e2;">
+                <i class="ph-fill ph-user-minus" style="font-size: 36px;"></i>
+            </div>
+            <h2 style="font-size: 24px; font-weight: 800; color: #991b1b; margin: 0; letter-spacing: -0.5px;">Remove Patient?</h2>
+            <p style="color: #b91c1c; font-size: 15px; font-weight: 600; margin-top: 8px;">Record: <span style="text-decoration: underline;">{{ patient.name }}</span></p>
+        </header>
+
+        <div style="background: #fffaf0; border: 1px solid #ffedd5; border-radius: 16px; padding: 20px; margin-bottom: 32px;">
+            <p style="color: #9a3412; font-size: 14px; line-height: 1.6; margin: 0; text-align: center;">
+                Deleting this record will permanently remove all associated medical visits and token history. <strong>This action is irreversible.</strong>
+            </p>
+        </div>
+
+        <form method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+            {% csrf_token %}
+
+            <button type="submit" class="btn-danger-action">
+                <i class="ph-bold ph-trash"></i> Permanently Delete Record
+            </button>
+
+            <a href="{% url 'patient_list' %}" class="btn-cancel-flat">
+                No, Keep Patient Record
+            </a>
+        </form>
+
+    </div>
+
+    <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 24px;">
+        <i class="ph-bold ph-lock"></i> Confirmation required for administrative audit logs.
+    </p>
+</div>
+
+<style>
+    /* DANGER BUTTON */
+    .btn-danger-action {
+        width: 100%;
+        height: 56px;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-danger-action:hover {
+        background: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);
+    }
+
+    /* CANCEL FLAT BUTTON */
+    .btn-cancel-flat {
+        text-align: center;
+        padding: 14px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s;
+        border-radius: 14px;
+    }
+
+    .btn-cancel-flat:hover {
+        background: #f1f5f9;
+        color: var(--text-main);
+    }
+</style>
+{% endblock %}

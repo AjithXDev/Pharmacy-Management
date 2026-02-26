@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Register New Client | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 40px auto;">
+    
+    <header style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; letter-spacing: -1px;">Register New Hospital</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Provision a new institutional node and administrative identity.</p>
+        </div>
+        <a href="{% url 'clients_list' %}" class="btn btn-outline" style="background: white;">
+            <i class="ph-bold ph-arrow-left"></i> Back to Directory
+        </a>
+    </header>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            
+            <div class="card" style="padding: 32px; border-radius: 20px; border: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <div style="width: 40px; height: 40px; background: #eff6ff; color: #3b82f6; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="ph-fill ph-buildings" style="font-size: 20px;"></i>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 700;">Hospital Details</h3>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="input-label">Hospital Name</label>
+                    <input type="text" name="hospital_name" placeholder="e.g. City General Hospital" required class="modern-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Geographic Location</label>
+                    <input type="text" name="location" placeholder="e.g. Tamil Nadu, India" class="modern-input">
+                </div>
+            </div>
+
+            <div class="card" style="padding: 32px; border-radius: 20px; border: 1px solid var(--border);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+                    <div style="width: 40px; height: 40px; background: #fef2f2; color: #ef4444; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="ph-fill ph-user-gear" style="font-size: 20px;"></i>
+                    </div>
+                    <h3 style="font-size: 18px; font-weight: 700;">Admin Identity</h3>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="input-label">Admin Username</label>
+                    <input type="text" name="admin_username" placeholder="e.g. admin_chennai" required class="modern-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Secure Password</label>
+                    <input type="password" name="admin_password" placeholder="••••••••" required class="modern-input">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card" style="margin-top: 24px; padding: 24px; border-radius: 20px; display: flex; justify-content: flex-end; align-items: center; gap: 16px; background: #f8fafc; border: 1px dashed var(--border);">
+            <p style="font-size: 13px; color: var(--text-muted); flex: 1;">
+                <i class="ph-bold ph-info" style="margin-right: 4px;"></i>
+                New institutions are set to <strong>Active</strong> status by default upon creation.
+            </p>
+            <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-size: 16px;">
+                <i class="ph-bold ph-rocket-launch"></i> Create Institutional Node
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .input-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        font-family: inherit;
+        font-size: 14px;
+        background: #fff;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+
+    .modern-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        background: white;
+    }
+
+    .card {
+        transition: transform 0.2s ease;
+    }
+</style>
+{% endblock %}

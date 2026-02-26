@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% block title %}Executive Dashboard{% endblock %}
+
+{% block content %}
+<header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+    <div>
+        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.2px;">Executive Dashboard</h1>
+        <div style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+            Last Updated: <span style="font-weight: 600; color: var(--text-main);">{% now "jS F Y, H:i" %}</span>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+        <div class="status-pill active-pill" style="font-size: 11px; letter-spacing: 0.5px;">
+            <i class="ph-fill ph-circle"></i> PLATFORM OPERATIONAL
+        </div>
+    </div>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px;">
+    <div class="card metric-card">
+        <div class="card-icon"><i class="ph-duotone ph-buildings"></i></div>
+        <h3 class="metric-label">Total Clients</h3>
+        <div class="metric-value">{{ hospital_count }}</div>
+        <div class="trend-indicator up">
+            <i class="ph-bold ph-trend-up"></i> +12.5% vs last year
+        </div>
+    </div>
+
+    <div class="card metric-card">
+        <div class="card-icon"><i class="ph-duotone ph-calendar-plus"></i></div>
+        <h3 class="metric-label">New Clients (This Month)</h3>
+        <div class="metric-value">{{ new_clients_this_month }}</div>
+        <div class="trend-indicator up">
+            <i class="ph-bold ph-plus"></i> 8.1% Velocity
+        </div>
+    </div>
+
+    <div class="card metric-card">
+        <div class="card-icon"><i class="ph-duotone ph-chart-line-up"></i></div>
+        <h3 class="metric-label">Growth % (MoM)</h3>
+        <div class="metric-value">{{ growth_percentage|floatformat:1 }}%</div>
+        <div class="trend-indicator" style="color: var(--primary);">Standard Tier Stability</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px; margin-bottom: 32px;">
+    <div class="card chart-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h4 style="font-weight: 700; color: var(--text-main);">6-Month Onboarding Trend</h4>
+            <i class="ph-bold ph-dots-three" style="color: var(--text-muted); cursor: pointer;"></i>
+        </div>
+        <div style="height: 280px; width: 100%;">
+            <canvas id="onboardingTrendChart"></canvas>
+        </div>
+    </div>
+
+    <div class="card chart-card">
+        <h4 style="font-weight: 700; color: var(--text-main); margin-bottom: 24px;">Client Distribution</h4>
+        <div style="height: 280px; width: 100%; display: flex; justify-content: center;">
+            <canvas id="locationDistChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card insight-card" style="background: linear-gradient(to right, #0f172a, #1e293b); color: white; border: none;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="background: rgba(56, 189, 248, 0.2); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
+            <i class="ph-fill ph-lightbulb" style="font-size: 24px;"></i>
+        </div>
+        <div>
+            <h4 style="font-weight: 700;">Growth Insight</h4>
+            <p style="font-size: 14px; opacity: 0.8; margin-top: 4px;">
+                Onboarding velocity has increased by 14% this quarter. Most growth is coming from <strong>Tier-1 Metropolitan regions</strong>. System capacity is currently at 64% with room for 120+ more clients.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .metric-card {
+        padding: 24px !important;
+    }
+    .card-icon {
+        font-size: 24px;
+        color: var(--primary);
+        margin-bottom: 16px;
+    }
+    .metric-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+    .metric-value {
+        font-size: 32px;
+        font-weight: 800;
+        margin: 8px 0;
+        color: var(--text-main);
+    }
+    .trend-indicator {
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .trend-indicator.up { color: #15803d; }
+
+    /* HOVER EFFECTS */
+    .card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border);
+    }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px -10px rgba(0,0,0,0.1);
+        border-color: var(--accent);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const trendLabels = {{ trend_labels|safe }};
+const trendCounts = {{ trend_counts|safe }};
+
+const ctx1 = document.getElementById('onboardingTrendChart').getContext('2d');
+new Chart(ctx1, {
+    type: 'line',
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            data: trendCounts,
+            borderColor: '#0284c7',
+            backgroundColor: 'rgba(2, 132, 199, 0.05)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true },
+            x: { grid: { display: false } }
+        }
+    }
+});
+</script>
+
+
+<script>
+const locationLabels = {{ location_labels|safe }};
+const locationCounts = {{ location_counts|safe }};
+
+const ctx2 = document.getElementById('locationDistChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+        labels: locationLabels,
+        datasets: [{
+            data: locationCounts,
+            backgroundColor: [
+                '#0f172a',
+                '#0284c7',
+                '#38bdf8',
+                '#94a3b8',
+                '#e2e8f0'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    boxWidth: 10,
+                    usePointStyle: true
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

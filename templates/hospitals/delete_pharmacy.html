@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Decommission Pharmacy | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 550px; margin: 80px auto;">
+    
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 2px solid #fee2e2; background: white; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.1);">
+        
+        <header style="text-align: center; margin-bottom: 32px;">
+            <div style="width: 80px; height: 80px; background: #fef2f2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 4px solid #fee2e2;">
+                <i class="ph-fill ph-warning-octagon" style="font-size: 40px;"></i>
+            </div>
+            <h2 style="font-size: 24px; font-weight: 800; color: #991b1b; margin: 0; letter-spacing: -0.5px;">Confirm Decommission</h2>
+            <p style="color: #b91c1c; font-size: 15px; font-weight: 600; margin-top: 8px;">You are about to delete <span style="text-decoration: underline;">{{ pharmacy.name }}</span></p>
+        </header>
+
+        <div style="background: #fffaf0; border: 1px solid #ffedd5; border-radius: 16px; padding: 20px; margin-bottom: 32px;">
+            <h4 style="color: #9a3412; font-size: 13px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <i class="ph-bold ph-info"></i> Critical Consequences:
+            </h4>
+            <ul style="margin: 0; padding-left: 20px; color: #c2410c; font-size: 14px; line-height: 1.6;">
+                <li>All <strong>Counters</strong> linked to this pharmacy will be wiped.</li>
+                <li>Historical <strong>Token Data</strong> will be permanently archived/deleted.</li>
+                <li>This action <strong>cannot be undone</strong>.</li>
+            </ul>
+        </div>
+
+        <form method="POST" style="display: flex; flex-direction: column; gap: 12px;">
+            {% csrf_token %}
+
+            <button type="submit" class="btn-danger-large">
+                <i class="ph-bold ph-trash"></i> Permanently Delete Pharmacy
+            </button>
+
+            <a href="{% url 'pharmacy_overview' %}" class="btn-cancel-link">
+                No, Keep this Pharmacy
+            </a>
+        </form>
+
+    </div>
+
+    <p style="text-align: center; color: var(--text-muted); font-size: 12px; margin-top: 24px;">
+        <i class="ph-bold ph-shield-check"></i> Authorized Personnel Only - Action Logged by System
+    </p>
+</div>
+
+<style>
+    /* DANGER BUTTON STYLE */
+    .btn-danger-large {
+        width: 100%;
+        height: 56px;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-danger-large:hover {
+        background: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger-large:active {
+        transform: translateY(0);
+    }
+
+    /* CANCEL LINK STYLE */
+    .btn-cancel-link {
+        text-align: center;
+        padding: 14px;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .btn-cancel-link:hover {
+        color: var(--text-main);
+    }
+</style>
+{% endblock %}

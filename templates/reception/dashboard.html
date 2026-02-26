@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Reception Dashboard | AIOHOS{% endblock %}
+
+{% block content %}
+<header style="margin-bottom: 40px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+        <span style="background: #f3e8ff; color: #a855f7; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+            Live Operations
+        </span>
+    </div>
+    <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.2px; color: var(--text-main); margin: 0;">Reception Dashboard</h1>
+    <p style="color: var(--text-muted); font-size: 15px; margin-top: 4px;">Welcome back. Manage patient intake and token flow across departments.</p>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px;">
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0f9ff; color: #0284c7;"><i class="ph-fill ph-users"></i></div>
+        <div>
+            <span class="stat-label">Patients Today</span>
+            <span class="stat-value">{{ patients_today }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #f0fdf4; color: #16a34a;"><i class="ph-fill ph-ticket"></i></div>
+        <div>
+            <span class="stat-label">Active Tokens</span>
+            <span class="stat-value">{{ active_tokens }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fff7ed; color: #ea580c;"><i class="ph-fill ph-clock"></i></div>
+        <div>
+            <span class="stat-label">Avg. Wait Time</span>
+            <span class="stat-value">{{ avg_wait }}m</span>
+        </div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+    <a href="{% url 'add_patient' %}" style="text-decoration: none; display: block;">
+        <div class="action-card-large">
+            <div style="flex: 1;">
+                <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 800; color: white;">New Registration</h3>
+                <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 14px; line-height: 1.5;">Register a new patient and issue service tokens instantly.</p>
+            </div>
+            <div class="action-circle">
+                <i class="ph-bold ph-user-plus"></i>
+            </div>
+        </div>
+    </a>
+
+    <div class="action-card-outline">
+        <div style="flex: 1;">
+            <h3 style="margin: 0 0 8px 0; font-size: 20px; font-weight: 800; color: var(--text-main);">Search Patient</h3>
+            <p style="margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.5;">Find existing patient records and history.</p>
+        </div>
+        <div class="action-circle-outline">
+            <i class="ph-bold ph-magnifying-glass"></i>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    /* STAT CARDS */
+    .stat-card {
+        background: white;
+        padding: 24px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); }
+    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .stat-label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { display: block; font-size: 24px; font-weight: 800; color: var(--text-main); }
+
+    /* ACTION CARD PRIMARY */
+    .action-card-large {
+        background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+        padding: 32px;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
+    }
+    .action-card-large:hover {
+        transform: scale(1.02);
+        box-shadow: 0 20px 30px -10px rgba(168, 85, 247, 0.5);
+    }
+    .action-circle {
+        width: 64px; height: 64px; background: rgba(255,255,255,0.2);
+        color: white; border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; font-size: 28px; backdrop-filter: blur(4px);
+    }
+
+    /* ACTION CARD OUTLINE */
+    .action-card-outline {
+        background: white;
+        padding: 32px;
+        border-radius: 24px;
+        border: 2px dashed var(--border);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .action-card-outline:hover {
+        border-color: var(--primary);
+        background: #f0f9ff;
+    }
+    .action-circle-outline {
+        width: 64px; height: 64px; background: #f8fafc;
+        color: var(--text-muted); border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; font-size: 28px; border: 1px solid var(--border);
+    }
+</style>
+{% endblock %}

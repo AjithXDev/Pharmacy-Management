@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Edit Configuration | {{ pharmacy.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 60px auto;">
+    
+    <a href="{% url 'pharmacy_overview' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+        <i class="ph-bold ph-arrow-left"></i> Discard Changes & Back
+    </a>
+
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid var(--border); background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);">
+        
+        <header style="margin-bottom: 32px;">
+            <div style="width: 56px; height: 56px; background: #fff7ed; color: #f59e0b; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid #ffedd5;">
+                <i class="ph-fill ph-pencil-circle" style="font-size: 28px;"></i>
+            </div>
+            <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -1px; color: var(--text-main); margin: 0;">Update Configuration</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Modifying parameters for <strong style="color: var(--primary);">{{ pharmacy.name }}</strong></p>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 24px;">
+                <label class="modern-label">Pharmacy Name</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-signature" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="name" value="{{ pharmacy.name }}" placeholder="Pharmacy Name" required class="modern-input">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label class="modern-label">Relocate Floor</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-map-pin-line" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="floor_name" value="{{ pharmacy.floor_name }}" placeholder="Floor Name" required class="modern-input">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 32px;">
+                <label class="modern-label">Service Type</label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-funnel" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); z-index: 10;"></i>
+                    <select name="pharmacy_type" required class="modern-input" style="appearance: none; cursor: pointer;">
+                        <option value="OP" {% if pharmacy.pharmacy_type == "OP" %}selected{% endif %}>Outpatient (OP) Services</option>
+                        <option value="IP" {% if pharmacy.pharmacy_type == "IP" %}selected{% endif %}>Inpatient (IP) Services</option>
+                    </select>
+                    <i class="ph-bold ph-caret-down" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; height: 52px; font-size: 16px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="ph-bold ph-floppy-disk"></i> Save Changes
+                </button>
+                <a href="{% url 'pharmacy_overview' %}" class="btn btn-outline" style="flex: 1; height: 52px; display: flex; align-items: center; justify-content: center; background: white; color: var(--text-muted);">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .modern-label {
+        display: block; 
+        font-size: 11px; 
+        font-weight: 800; 
+        color: var(--text-muted); 
+        margin-bottom: 8px; 
+        text-transform: uppercase; 
+        letter-spacing: 0.8px;
+    }
+
+    .modern-input {
+        width: 100%; 
+        padding: 14px 14px 14px 48px; 
+        border-radius: 12px; 
+        border: 1px solid var(--border); 
+        font-family: inherit; 
+        font-size: 15px; 
+        outline: none; 
+        transition: all 0.2s ease; 
+        background: #fcfcfc;
+        color: var(--text-main);
+    }
+
+    .modern-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+        background: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}KPI Metrics{% endblock %}
+
+{% block content %}
+
+<h1 style="margin-bottom:30px;">Token KPI Metrics</h1>
+
+<!-- 🔷 KPI CARDS -->
+<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px; margin-bottom:40px;">
+
+    <div class="card">
+        <h4>Tokens Today</h4>
+        <h1>{{ tokens_today }}</h1>
+
+        {% if trend > 0 %}
+            <small style="color:green;">↑ {{ trend }} from yesterday</small>
+        {% elif trend < 0 %}
+            <small style="color:red;">↓ {{ trend_abs }} from yesterday</small>
+        {% else %}
+            <small>No change</small>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h4>Waiting Tokens</h4>
+        <h1 style="color:#f59e0b;">{{ waiting }}</h1>
+    </div>
+
+    <div class="card">
+        <h4>Completed Tokens</h4>
+        <h1 style="color:#16a34a;">{{ completed }}</h1>
+    </div>
+
+</div>
+
+<!-- 🔷 VISUAL COMPARISON CHART -->
+<div class="card">
+    <h3 style="margin-bottom:20px;">
+        Yesterday vs Today Comparison
+    </h3>
+
+    <canvas id="comparisonChart"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const labels = {{ chart_labels }};
+const dataValues = {{ chart_data }};
+
+new Chart(document.getElementById('comparisonChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Tokens',
+            data: dataValues,
+            backgroundColor: ['#94a3b8', '#0284c7'],
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Issue Token | {{ patient.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 40px auto;">
+
+    <a href="{% url 'reception_dashboard' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+        <i class="ph-bold ph-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="card" style="padding: 32px; border-radius: 24px; border: 1px solid var(--border); background: white; margin-bottom: 24px; display: flex; align-items: center; gap: 32px; position: relative; overflow: hidden;">
+        <i class="ph-fill ph-user-circle" style="position: absolute; right: -20px; bottom: -20px; font-size: 160px; color: #f8fafc; z-index: 0;"></i>
+
+        <div style="z-index: 1; display: flex; align-items: center; gap: 24px; flex: 1;">
+            <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.3);">
+                {{ patient.name|slice:":1"|upper }}
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; flex: 1;">
+                <div>
+                    <span style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Patient Name</span>
+                    <span style="font-size: 20px; font-weight: 800; color: var(--text-main);">{{ patient.name }}</span>
+                </div>
+                <div>
+                    <span style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Contact Number</span>
+                    <span style="font-size: 16px; font-weight: 700; color: var(--text-main);">{{ patient.phone }}</span>
+                </div>
+                <div style="display: flex; gap: 40px;">
+                    <div>
+                        <span style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Age</span>
+                        <span style="font-size: 16px; font-weight: 700; color: var(--text-main);">{{ patient.age }} yrs</span>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Gender</span>
+                        <span style="font-size: 16px; font-weight: 700; color: var(--text-main);">{{ patient.gender }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #f0fdf4; border: 2px dashed #bbf7d0; border-radius: 24px; padding: 40px; text-align: center; margin-bottom: 32px;">
+        <div style="width: 64px; height: 64px; background: #16a34a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.2);">
+            <i class="ph-bold ph-prescription"></i>
+        </div>
+        <h3 style="font-size: 22px; font-weight: 800; color: #166534; margin-bottom: 8px;">Prescription Required</h3>
+        <p style="color: #15803d; font-size: 15px; margin-bottom: 24px; max-width: 400px; margin-left: auto; margin-right: auto;">
+            To issue a service token, please first document the patient's prescription and medicine requirements.
+        </p>
+        
+        <a href="{% url 'create_prescription' patient.id %}" class="btn-prescription">
+            <i class="ph-bold ph-plus-circle"></i> Create New Prescription
+        </a>
+    </div>
+
+</div>
+
+<style>
+    /* PRESCRIPTION BUTTON DESIGN */
+    .btn-prescription {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 32px;
+        background: #16a34a;
+        color: white;
+        text-decoration: none;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 700;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.2);
+    }
+
+    .btn-prescription:hover {
+        background: #15803d;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(22, 163, 74, 0.3);
+    }
+
+    .btn-prescription i {
+        font-size: 20px;
+    }
+</style>
+{% endblock %}

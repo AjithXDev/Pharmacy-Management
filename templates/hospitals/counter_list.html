@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% block title %}Manage Counters | {{ pharmacy.name }}{% endblock %}
+
+{% block content %}
+<header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+    <div>
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+            <i class="ph-bold ph-first-aid"></i> Pharmacy Node
+        </div>
+        <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -1.2px; color: var(--text-main); margin: 0;">
+            {{ pharmacy.name }} <span style="color: var(--text-muted); font-weight: 400;">/ Counters</span>
+        </h1>
+    </div>
+
+    <div style="display: flex; gap: 12px;">
+        <a href="{% url 'pharmacy_overview' %}" class="btn btn-outline" style="background: white;">
+            <i class="ph-bold ph-arrow-left"></i> Back
+        </a>
+        <a href="{% url 'add_counter' pharmacy.id %}" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);">
+            <i class="ph-bold ph-plus"></i> Add Counter
+        </a>
+    </div>
+</header>
+
+<div class="card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid var(--border); background: white;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: #f8fafc; border-bottom: 1px solid var(--border);">
+            <tr>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Counter Assignment</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Node Status</th>
+                <th style="padding: 18px 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Management</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for counter in counters %}
+            <tr class="counter-row">
+                <td style="padding: 20px 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="counter-number-box">
+                            {{ counter.counter_number }}
+                        </div>
+                        <div>
+                            <span style="display: block; font-weight: 700; color: var(--text-main); font-size: 16px;">Counter Node {{ counter.counter_number }}</span>
+                            <span style="font-size: 12px; color: var(--text-muted);">Active Dispensary Station</span>
+                        </div>
+                    </div>
+                </td>
+
+                <td style="padding: 20px 24px; text-align: center;">
+                    {% if counter.is_active %}
+                        <span class="status-badge-modern active">
+                            <span class="pulse-dot"></span> Online
+                        </span>
+                    {% else %}
+                        <span class="status-badge-modern offline">
+                            <span class="static-dot"></span> Offline
+                        </span>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 20px 24px; text-align: right;">
+                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                        <a href="{% url 'toggle_counter' counter.id %}" 
+                           class="toggle-btn {% if counter.is_active %}deactivate{% else %}activate{% endif %}">
+                            {% if counter.is_active %}
+                                <i class="ph-bold ph-power"></i> Disable Node
+                            {% else %}
+                                <i class="ph-bold ph-lightning"></i> Enable Node
+                            {% endif %}
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="padding: 80px 24px; text-align: center;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                        <i class="ph-duotone ph-monitor" style="font-size: 64px; color: var(--border);"></i>
+                        <p style="color: var(--text-muted); font-weight: 500;">No counters registered for this pharmacy.</p>
+                        <a href="{% url 'add_counter' pharmacy.id %}" class="btn btn-outline btn-sm">Initialize Counter 01</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .counter-row {
+        border-bottom: 1px solid var(--border);
+        transition: all 0.2s ease;
+    }
+    
+    .counter-row:hover {
+        background-color: #f8fafc;
+    }
+
+    /* COUNTER BOX */
+    .counter-number-box {
+        width: 44px;
+        height: 44px;
+        background: #0f172a;
+        color: white;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 18px;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+
+    /* STATUS BADGES */
+    .status-badge-modern {
+        padding: 6px 14px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge-modern.active { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .status-badge-modern.offline { background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        animation: pulse-ring 1.5s infinite;
+    }
+
+    .static-dot { width: 8px; height: 8px; background: #94a3b8; border-radius: 50%; }
+
+    @keyframes pulse-ring {
+        0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    /* TOGGLE BUTTONS */
+    .toggle-btn {
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn.deactivate {
+        background: #fff;
+        color: #ef4444;
+        border: 1px solid #fecaca;
+    }
+
+    .toggle-btn.deactivate:hover {
+        background: #fef2f2;
+        transform: translateY(-1px);
+    }
+
+    .toggle-btn.activate {
+        background: #fff;
+        color: #0284c7;
+        border: 1px solid #bae6fd;
+    }
+
+    .toggle-btn.activate:hover {
+        background: #f0f9ff;
+        transform: translateY(-1px);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIOHOS | {% block title %}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0284c7; --primary-hover: #0369a1; --accent: #38bdf8;
+            --bg-main: #f8fafc; --sidebar-bg: #ffffff; --text-main: #0f172a;
+            --text-muted: #64748b; --border: rgba(226, 232, 240, 0.8);
+            --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-main); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* Sidebar Design */
+        aside { width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 32px 20px; z-index: 10; }
+        .brand { display: flex; align-items: center; gap: 14px; padding: 0 12px 40px; }
+        .logo-sq { width: 36px; height: 36px; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.8px; }
+
+        nav { flex: 1; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; border-radius: 12px; margin-bottom: 6px; transition: var(--transition); }
+        .nav-link:hover { background: #f1f5f9; color: var(--text-main); }
+        .nav-link.active { background: var(--primary); color: white; box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.3); }
+
+        .logout { margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px; color: #ef4444; text-decoration: none; }
+
+        /* Main Content Area */
+        main { flex: 1; overflow-y: auto; padding: 48px 64px; scroll-behavior: smooth; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 28px; transition: var(--transition); margin-bottom: 24px;}
+        .card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); }
+
+        .btn { padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; transition: var(--transition); border: none; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;}
+        .btn-primary { background: var(--text-main); color: white; }
+        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-main); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 18px 24px; background: #f8fafc; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); text-align: left; }
+        td { padding: 20px 24px; font-size: 14px; border-bottom: 1px solid var(--border); }
+        
+        .status-pill { padding: 6px 12px; border-radius: 100px; font-size: 12px; font-weight: 700; }
+        .active-pill { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+        /* Premium Hover Animation */
+    .card {
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary);
+    }
+
+    /* Subtle glow effect on hover */
+    .card::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, transparent 100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none; 
+    }
+
+    .card:hover::after {
+        opacity: 1;
+    }
+
+    .visual-container {
+        margin-top: 32px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 28px;
+    }
+    </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+        <div class="logo-sq">A</div>
+        <div class="brand-name">AIOHOS</div>
+    </div>
+
+    <nav>
+
+        <!-- 🔵 PLATFORM ADMIN -->
+        {% if request.user.is_superuser or request.user.role == "PLATFORM_ADMIN" %}
+
+            <a href="{% url 'platform_dashboard' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'platform_dashboard' %}active{% endif %}">
+                <i class="ph-duotone ph-chart-pie-slice"></i> Dashboard
+            </a>
+
+            <a href="{% url 'clients_list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'clients_list' %}active{% endif %}">
+                <i class="ph-duotone ph-hospital"></i> Clients
+            </a>
+
+            <a href="{% url 'admins_list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'admins_list' %}active{% endif %}">
+                <i class="ph-duotone ph-users-four"></i> Admins
+            </a>
+
+            <a href="{% url 'audit_logs' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'audit_logs' %}active{% endif %}">
+                <i class="ph-duotone ph-file-text"></i> Audit Logs
+            </a>
+
+            <a href="{% url 'settings' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                <i class="ph-duotone ph-gear-six"></i> Settings
+            </a>
+
+        {% endif %}
+
+
+        <!-- 🔵 HOSPITAL ADMIN -->
+        {% if request.user.role == "HOSPITAL_ADMIN" %}
+
+            <a href="{% url 'hospital_dashboard' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_dashboard' %}active{% endif %}">
+                <i class="ph-duotone ph-chart-bar"></i> Dashboard
+            </a>
+
+            <a href="{% url 'hospital_kpi' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_kpi' %}active{% endif %}">
+                <i class="ph-duotone ph-trend-up"></i> KPI Metrics
+            </a>
+
+            <a href="{% url 'hospital_analytics' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_analytics' %}active{% endif %}">
+                <i class="ph-duotone ph-activity"></i> Analytics
+            </a>
+
+            <a href="{% url 'pharmacy_overview' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'pharmacy_overview' %}active{% endif %}">
+                <i class="ph-duotone ph-pill"></i> Pharmacies
+            </a>
+             <!-- NEW: COUNTERS -->
+    <a href="{% url 'all_counters' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'all_counters' %}active{% endif %}">
+        <i class="ph-duotone ph-number-circle-eight"></i> Counters
+    </a>
+
+    <!-- NEW: PHARMACY HEAD MANAGEMENT -->
+    <a href="{% url 'pharmacy_heads' %}"
+       class="nav-link {% if request.resolver_match.url_name == 'pharmacy_heads' %}active{% endif %}">
+        <i class="ph-duotone ph-user-gear"></i> Pharmacy Heads
+    </a>
+
+        {% endif %}
+
+        {% if request.user.role == "RECEPTION_STAFF" %}
+
+            <a href="{% url 'reception_dashboard' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_dashboard' %}active{% endif %}">
+                <i class="ph-duotone ph-chart-bar"></i> Dashboard
+            </a>
+
+            <a href="{% url 'add_patient' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_kpi' %}active{% endif %}">
+                <i class="ph-duotone ph-trend-up"></i> Add Patient
+            </a>
+
+             <a href="{% url 'patient_list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'admins_list' %}active{% endif %}">
+                <i class="ph-duotone ph-users-four"></i> Patients
+            </a>
+
+            
+        {% endif %}
+
+         {% if request.user.role == "PHARMACY_MANAGER" %}
+
+         <a href="{% url 'pharmacy_dashboard' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'pharmacy_overview' %}active{% endif %}">
+                <i class="ph-duotone ph-pill"></i> Dashboard
+            </a>
+
+            <a href="{% url 'counter_list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_dashboard' %}active{% endif %}">
+                <i class="ph-duotone ph-chart-bar"></i> Counters
+            </a>
+
+            <a href="{% url 'add_counter' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'hospital_kpi' %}active{% endif %}">
+                <i class="ph-duotone ph-trend-up"></i> Add Counters
+            </a>
+
+             <a href="{% url 'waiting_list' %}"
+               class="nav-link {% if request.resolver_match.url_name == 'admins_list' %}active{% endif %}">
+                <i class="ph-duotone ph-users-four"></i> Waiting
+            </a>
+
+            
+        {% endif %}
+       
+       
+    </nav>
+
+    <!-- 🔴 LOGOUT FOR ALL -->
+    <a href="{% url 'logout' %}" class="nav-link logout">
+        <i class="ph-bold ph-power"></i> Sign Out
+    </a>
+
+</aside>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Edit Hospital | AIOHOS{% endblock %}
+
+{% block content %}
+<div style="max-width: 640px; margin: 40px auto;">
+    <a href="{% url 'clients_list' %}" style="text-decoration: none; color: var(--text-muted); font-size: 14px; display: flex; align-items: center; gap: 8px; margin-bottom: 24px; transition: color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">
+        <i class="ph-bold ph-arrow-left"></i> Back to Client Directory
+    </a>
+
+    <div class="card" style="padding: 40px; border-radius: 24px; border: 1px solid var(--border); background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);">
+        
+        <header style="margin-bottom: 32px;">
+            <div style="width: 48px; height: 48px; background: #f0f9ff; color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                <i class="ph-fill ph-hospital" style="font-size: 24px;"></i>
+            </div>
+            <h2 style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main);">Edit Institutional Details</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Update the registration and geographic profile of this client node.</p>
+        </header>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Hospital Name
+                </label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-buildings" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="name" value="{{ hospital.name }}" required
+                           style="width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; border: 1px solid var(--border); font-family: inherit; font-size: 15px; outline: none; transition: all 0.2s ease;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 32px;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Geographic Location
+                </label>
+                <div style="position: relative;">
+                    <i class="ph-bold ph-map-pin" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" name="location" value="{{ hospital.location }}" required
+                           style="width: 100%; padding: 14px 14px 14px 48px; border-radius: 12px; border: 1px solid var(--border); font-family: inherit; font-size: 15px; outline: none; transition: all 0.2s ease;">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; border-top: 1px solid var(--border); padding-top: 32px;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center; height: 48px; font-size: 15px;">
+                    <i class="ph-bold ph-check"></i> Save Changes
+                </button>
+                <a href="{% url 'clients_list' %}" class="btn btn-outline" style="flex: 1; justify-content: center; height: 48px; font-size: 15px; background: white;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div style="margin-top: 24px; padding: 20px; border-radius: 16px; background: #f8fafc; border: 1px dashed var(--border); display: flex; gap: 12px; align-items: flex-start;">
+        <i class="ph-bold ph-info" style="color: var(--primary); font-size: 20px; margin-top: 2px;"></i>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+            Changing the institutional name will reflect across all audit logs and admin associations. Ensure the location follows the standard format (City, Country).
+        </p>
+    </div>
+</div>
+
+<style>
+    input:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1) !important;
+        background-color: #fff;
+    }
+    
+    input {
+        background-color: #fcfcfc;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+    }
+</style>
+{% endblock %}

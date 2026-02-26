@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Medicine List</h2>
+
+<a href="{% url 'add_medicines' %}">Add Medicine</a>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Cold Storage</th>
+</tr>
+
+{% for med in medicines %}
+<tr>
+    <td>{{ med.name }}</td>
+    <td>{{ med.type }}</td>
+    <td>{{ med.cold_storage }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

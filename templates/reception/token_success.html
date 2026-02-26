@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Token #{{ token.token_number }} Issued{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto; text-align: center;">
+
+    <div style="margin-bottom: 24px;">
+        <div class="success-check-pulse">
+            <i class="ph-fill ph-check-circle"></i>
+        </div>
+        <h2 style="font-size: 28px; font-weight: 800; color: var(--text-main); margin-top: 16px;">Queue Initialized</h2>
+        <p style="color: var(--text-muted); font-size: 15px;">Your position in the pharmacy queue is secured.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div class="info-pill">
+            <i class="ph-bold ph-hourglass-low" style="color: #f59e0b;"></i>
+            <div>
+                <span class="pill-label">Est. Wait</span>
+                <span class="pill-value">{{ expected_wait_minutes }} Mins</span>
+            </div>
+        </div>
+        <div class="info-pill">
+            <i class="ph-bold ph-receipt" style="color: #10b981;"></i>
+            <div>
+                <span class="pill-label">Est. Billing</span>
+                <span class="pill-value">{{ estimated_billing_time|time:"H:i" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="token-card-v2">
+        <div class="card-header-stripe">
+            <span>{{ token.pharmacy.name }}</span>
+            <span style="opacity: 0.8;">{{ token.pharmacy.floor_name }}</span>
+        </div>
+        
+        <div style="padding: 32px 20px;">
+            <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px;">Current Token Number</span>
+            <div class="big-token-display">
+                <span class="hash">#</span>{{ token.token_number }}
+            </div>
+            
+            <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; color: #64748b; font-size: 13px; font-weight: 600;">
+                <i class="ph-bold ph-clock"></i> Generated at {{ token.created_at|time:"H:i" }}
+            </div>
+        </div>
+
+        <div class="barcode-area">
+            <div class="barcode-line" style="width: 2px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 4px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 1px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 2px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 6px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 2px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 1px; height: 30px;"></div>
+            <div class="barcode-line" style="width: 4px; height: 30px;"></div>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 32px;">
+        <button onclick="window.print()" class="btn btn-primary" style="height: 56px; background: #0f172a; border: none; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <i class="ph-bold ph-printer"></i> Print Token Slip
+        </button>
+        <a href="{% url 'reception_dashboard' %}" style="text-decoration: none; font-weight: 700; color: var(--text-muted); font-size: 14px; padding: 10px;">
+            Close & Go Back
+        </a>
+    </div>
+
+</div>
+
+<style>
+    .success-check-pulse {
+        width: 72px; height: 72px; background: #f0fdf4; color: #16a34a;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 40px; margin: 0 auto; border: 4px solid #dcfce7;
+        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(22, 163, 74, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    .info-pill {
+        background: white; border: 1px solid var(--border);
+        padding: 12px; border-radius: 16px; display: flex; align-items: center;
+        gap: 12px; text-align: left;
+    }
+
+    .pill-label { display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+    .pill-value { display: block; font-size: 14px; font-weight: 800; color: var(--text-main); }
+
+    .token-card-v2 {
+        background: white; border-radius: 24px; overflow: hidden;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border);
+    }
+
+    .card-header-stripe {
+        background: var(--primary); color: white; padding: 12px 20px;
+        display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;
+    }
+
+    .big-token-display {
+        font-size: 84px; font-weight: 900; color: #0f172a;
+        margin: 10px 0; letter-spacing: -2px;
+    }
+
+    .big-token-display .hash { color: var(--primary); opacity: 0.3; font-size: 48px; }
+
+    .barcode-area {
+        background: #f8fafc; padding: 15px; display: flex; justify-content: center; gap: 2px;
+        border-top: 1px dashed #e2e8f0;
+    }
+
+    .barcode-line { background: #cbd5e1; border-radius: 1px; }
+
+    @media print {
+        .token-card-v2 { border: 2px solid #000; box-shadow: none; }
+        .btn, a, .success-check-pulse, .info-pill { display: none !important; }
+    }
+</style>
+{% endblock %}
