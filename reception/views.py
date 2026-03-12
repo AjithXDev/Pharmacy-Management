@@ -11,6 +11,7 @@ from datetime import date
 from datetime import timedelta
 import math
 from pharmacy.views import *
+from .ml_predict import predict_billing_time
 
 
 
@@ -24,6 +25,7 @@ def generate_token(request, prescription_id, pharmacy_id):
     if request.method != "POST":
         return redirect("reception_dashboard")
 
+    # 🔹 Get prescription
     prescription = get_object_or_404(
         Prescription,
         id=prescription_id
@@ -31,45 +33,100 @@ def generate_token(request, prescription_id, pharmacy_id):
 
     patient = prescription.patient
 
+    # 🔹 Get pharmacy
     pharmacy = get_object_or_404(
         Pharmacy,
         id=pharmacy_id,
         hospital=request.user.hospital
     )
 
-    # 🔹 Next token number
+    # 🔹 Find next token number
     last_token = Token.objects.filter(
         pharmacy=pharmacy
-    ).aggregate(Max('token_number'))
+    ).aggregate(Max("token_number"))
 
     next_number = 1
-    if last_token['token_number__max']:
-        next_number = last_token['token_number__max'] + 1
+    if last_token["token_number__max"]:
+        next_number = last_token["token_number__max"] + 1
 
-    # 🔹 Count waiting tokens before this one
+
+    # 🔹 Queue length (patients waiting before this token)
     waiting_count = Token.objects.filter(
         pharmacy=pharmacy,
         status="WAITING"
     ).count()
 
-    # 🔹 Assume 5 mins per patient (you can change this)
-    average_minutes_per_patient = 5
 
-    expected_wait = waiting_count * average_minutes_per_patient
+    # 🔹 Medicine count from prescription
+    medicine_count = PrescriptionItem.objects.filter(
+        prescription=prescription
+    ).count()
 
+
+    # 🔹 Default ML features (can improve later)
+    test_count = 0
+    payment_type = 0
+    emergency = 0
+
+
+    # 🔹 Active counters
+    active_counters = Counter.objects.filter(
+        pharmacy=pharmacy,
+        is_active=True
+    ).count()
+
+    if active_counters == 0:
+        active_counters = 1
+
+
+    # 🔹 ML billing time prediction
+    billing_time = predict_billing_time(
+        medicine_count,
+        test_count,
+        waiting_count,
+        active_counters,
+        payment_type,
+        emergency
+    )
+
+
+    # 🔹 Total wait seconds
+    queue_batches = math.ceil(waiting_count / active_counters)
+
+    expected_wait_seconds = (queue_batches * billing_time) + billing_time
+
+    # 🔹 Expected billing start time
+    expected_billing_time = timezone.now() + timedelta(
+        seconds=expected_wait_seconds
+    )
+
+
+    # 🔹 Create token
     token = Token.objects.create(
         hospital=pharmacy.hospital,
         pharmacy=pharmacy,
         patient=patient,
         prescription=prescription,
         token_number=next_number,
-        status="WAITING"
+        status="WAITING",
+        billing_expected_time=expected_billing_time
     )
 
+
+    # 🔹 Optional queue recalculation
     recalculate_queue(pharmacy)
 
-    # 🔥 Pass expected time through URL (temporary store)
-    request.session["expected_wait"] = expected_wait
+
+    # 🔹 Debug logs (for development)
+    print("------ TOKEN CREATED ------")
+    print("Token Number:", token.token_number)
+    print("Medicine Count:", medicine_count)
+    print("Queue Length:", waiting_count)
+    print("Active Counters:", active_counters)
+    print("Predicted Billing Time:", billing_time)
+    print("Expected Billing Time:", expected_billing_time)
+    print("---------------------------")
+
 
     return redirect("token_success", token_id=token.id)
     
@@ -122,26 +179,9 @@ def token_success(request, token_id):
 
     token = get_object_or_404(Token, id=token_id)
 
-    pharmacy = token.pharmacy
-
-    # 🔥 Count waiting tokens created before this one
-    waiting_count = Token.objects.filter(
-        pharmacy=pharmacy,
-        status="WAITING",
-        created_at__lt=token.created_at
-    ).count()
-
-    # 🔹 Average time per patient
-    average_minutes_per_patient = 5
-
-    expected_wait = waiting_count * average_minutes_per_patient
-
-    estimated_billing_time = timezone.now() + timedelta(minutes=expected_wait)
-
     context = {
         "token": token,
-        "expected_wait_minutes": expected_wait,
-        "estimated_billing_time": estimated_billing_time
+        "expected_billing_time": token.billing_expected_time
     }
 
     return render(request, "reception/token_success.html", context)

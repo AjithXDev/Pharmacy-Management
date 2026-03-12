@@ -6,6 +6,8 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
 
+from reception.models import Token, PrescriptionItem
+from reception.ml_predict import predict_billing_time
 
 
 # 🔹 Dashboard
@@ -67,25 +69,34 @@ def counter_list(request):
 @login_required
 def start_billing(request, token_id):
 
-    token = get_object_or_404(Token, id=token_id)
+    token = Token.objects.get(id=token_id)
 
-    if token.status != "READY":
-        return redirect("pharmacy_dashboard")
-
-    token.status = "BILLING"
     token.billing_start_time = timezone.now()
+    token.status = "BILLED"
 
-    medicine_count = token.prescription.items.count()
+    # 🔥 calculate medicine count
+    medicine_count = PrescriptionItem.objects.filter(
+        prescription=token.prescription
+    ).count()
 
-    total_seconds = medicine_count * 30  # 🔥 30 sec per medicine
+    # predicted time (seconds)
+    predicted_time = predict_billing_time(
+        medicine_count,
+        0,
+        0,
+        1,
+        0,
+        0
+    )
 
+    # 🔥 set expected billing finish
     token.billing_expected_time = (
-        token.billing_start_time + timedelta(seconds=total_seconds)
+        token.billing_start_time + timedelta(seconds=predicted_time)
     )
 
     token.save()
 
-    return redirect("pharmacy_dashboard")
+    return redirect("counter_list")
 
 def auto_complete_billing():
 
@@ -136,7 +147,7 @@ def waiting_list(request):
     waiting_tokens = list(Token.objects.filter(
         pharmacy=pharmacy,
         status="WAITING"
-    ).order_by("created_at"))
+    ).order_by("token_number"))
 
     if active_counters.exists():
 
@@ -194,9 +205,9 @@ def toggle_counter(request, counter_id):
     return redirect("counter_list")
 
 
-def recalculate_queue(pharmacy):
 
-    service_time = timedelta(minutes=4)
+
+def recalculate_queue(pharmacy):
 
     active_counters = Counter.objects.filter(
         pharmacy=pharmacy,
@@ -206,15 +217,15 @@ def recalculate_queue(pharmacy):
     if not active_counters.exists():
         return
 
-    # Get waiting tokens
+    # waiting tokens
     waiting_tokens = Token.objects.filter(
         pharmacy=pharmacy,
         status="WAITING"
-    ).order_by("created_at")
+    ).order_by("token_number")   # better than created_at
 
     for counter in active_counters:
 
-        # Check if counter already has active token
+        # check if counter already busy
         current = Token.objects.filter(
             pharmacy=pharmacy,
             counter=counter,
@@ -222,21 +233,43 @@ def recalculate_queue(pharmacy):
         ).first()
 
         if current:
-            continue  # counter busy
+            continue
 
-        # Assign next waiting token
+        # next token
         next_token = waiting_tokens.first()
 
         if not next_token:
             break
 
+        # 🔥 billing start
         next_token.status = "BILLED"
         next_token.counter = counter
         next_token.billing_start_time = timezone.now()
+
+        # 🔥 medicine count
+        medicine_count = PrescriptionItem.objects.filter(
+            prescription=next_token.prescription
+        ).count()
+
+        # 🔥 ML predicted billing time
+        predicted = predict_billing_time(
+            medicine_count,
+            0,   # test_count
+            0,   # tokens_before
+            1,   # active_counters
+            0,   # payment_type
+            0    # emergency
+        )
+
+        # 🔥 expected finish time
+        next_token.billing_expected_time = (
+            next_token.billing_start_time +
+            timedelta(seconds=predicted*3)
+        )
+
         next_token.save()
 
         waiting_tokens = waiting_tokens.exclude(id=next_token.id)
-
 
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -303,3 +336,24 @@ def finish_prepare(request, prep_id):
     prep.save()
 
     return redirect("prepare_list")
+
+from reception.queue_engine import update_future_tokens
+from datetime import timedelta
+
+
+def delay_billing(request, token_id):
+
+    token = Token.objects.get(id=token_id)
+
+    delay_seconds = 120
+
+    token.billing_expected_time += timedelta(seconds=delay_seconds)
+    token.save()
+
+    update_future_tokens(
+        pharmacy=token.pharmacy,
+        delayed_token=token,
+        delay_seconds=delay_seconds
+    )
+
+    return redirect("pharmacy_dashboard")

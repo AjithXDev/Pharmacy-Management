@@ -11,6 +11,8 @@ urlpatterns = [
     path("prepare/", views.prepare_list, name="prepare_list"),
     path("start/<int:prep_id>/", views.start_prepare, name="start_prepare"),
     path("finish/<int:prep_id>/", views.finish_prepare, name="finish_prepare"),
+path("start-billing/<int:token_id>/", views.start_billing, name="start_billing"),
+path("delay-billing/<int:token_id>/", views.delay_billing, name="delay_billing"),
   
     
 ]

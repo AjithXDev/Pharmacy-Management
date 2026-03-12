@@ -1,6 +1,5 @@
 from django.db import models
 from hospitals.models import *
-from .models import *
 from pharmacy.models import *
 
 
@@ -65,6 +64,7 @@ class Token(models.Model):
     billing_start_time = models.DateTimeField(null=True, blank=True)
     billing_expected_time = models.DateTimeField(null=True, blank=True)
     billing_completed_time = models.DateTimeField(null=True, blank=True)
+    alert_message_sent = models.BooleanField(default=False)
 
 
 

@@ -60,16 +60,43 @@
                     {% endif %}
                 </td>
 
-                <td style="padding: 20px 24px;">
-                    {% if item.token %}
-                        <div class="timer-container">
-                            <i class="ph-bold ph-clock"></i>
-                            <span class="billing-timer" data-start="{{ item.token.billing_start_time|date:'c' }}">--:--</span>
-                        </div>
-                    {% else %}
-                        <span style="color: #cbd5e1;">-</span>
-                    {% endif %}
-                </td>
+                <td style="padding:20px 24px;">
+
+{% if item.token %}
+
+<div class="timer-container">
+
+<i class="ph-bold ph-clock"></i>
+
+<span
+class="billing-timer"
+data-expected="{{ item.token.billing_expected_time|date:'c' }}"
+data-token="{{ item.token.id }}"
+>
+--:--
+</span>
+
+<div class="billing-actions" id="actions-{{ item.token.id }}" style="display:none">
+
+<a href="{% url 'complete_billing' item.token.id %}" class="btn-op btn-finish">
+OK
+</a>
+
+<a href="{% url 'delay_billing' item.token.id %}" class="btn-op btn-off">
+WAIT
+</a>
+
+</div>
+
+</div>
+
+{% else %}
+
+<span style="color:#cbd5e1;">-</span>
+
+{% endif %}
+
+</td>
 
                 <td style="padding: 20px 24px; text-align: right;">
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
@@ -77,14 +104,12 @@
                             <i class="ph-bold ph-power"></i>
                         </a>
                         {% if item.token %}
-                            <a href="{% url 'complete_billing' item.token.id %}" class="btn-op btn-finish">
-                                <i class="ph-bold ph-check"></i> Finish
-                            </a>
+                          
                         {% endif %}
                     </div>
                 </td>
             </tr>
-            {% endfor %}
+        {% endfor %}
         </tbody>
     </table>
 </div>
@@ -117,25 +142,41 @@
 
 <script>
 function updateBillingTimers() {
-    const elements = document.querySelectorAll(".billing-timer");
-    elements.forEach(function(el) {
-        const start = new Date(el.dataset.start);
-        const now = new Date();
-        const diff = now - start;
-        const max = 4 * 60 * 1000; // 4 Minutes
 
-        if (diff >= max) {
-            el.innerHTML = "⚠ Over Time";
-            el.parentElement.classList.add("timer-overtime");
+    const timers = document.querySelectorAll(".billing-timer");
+
+    timers.forEach(function(el) {
+
+        const expectedTime = el.getAttribute("data-expected");
+        if (!expectedTime) return;
+
+        const expected = new Date(expectedTime);
+        const now = new Date();
+
+        const diff = expected - now;
+        const tokenId = el.getAttribute("data-token");
+
+        if (diff <= 0) {
+
+            el.innerHTML = "⚠ Billing finished";
+
+            const actionDiv = document.getElementById("actions-" + tokenId);
+
+            if (actionDiv) {
+                actionDiv.style.display = "flex";
+            }
+
         } else {
-            const remaining = max - diff;
-            const m = Math.floor(remaining / 60000);
-            const s = Math.floor((remaining % 60000) / 1000);
-            el.innerHTML = m + "m " + s + "s";
-            el.parentElement.classList.remove("timer-overtime");
+
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+
+            el.innerHTML = minutes + "m " + seconds + "s";
         }
+
     });
 }
+
 setInterval(updateBillingTimers, 1000);
 updateBillingTimers();
 </script>

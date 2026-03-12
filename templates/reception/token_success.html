@@ -16,15 +16,15 @@
         <div class="info-pill">
             <i class="ph-bold ph-hourglass-low" style="color: #f59e0b;"></i>
             <div>
-                <span class="pill-label">Est. Wait</span>
-                <span class="pill-value">{{ expected_wait_minutes }} Mins</span>
+                <span class="pill-label">Queue Ahead</span>
+<span class="pill-value">{{ token.token_number|add:"-1" }}</span>
             </div>
         </div>
         <div class="info-pill">
             <i class="ph-bold ph-receipt" style="color: #10b981;"></i>
             <div>
-                <span class="pill-label">Est. Billing</span>
-                <span class="pill-value">{{ estimated_billing_time|time:"H:i" }}</span>
+                <span class="pill-label">Expected Billing</span>
+<span class="pill-value">{{ expected_billing_time|time:"H:i" }}</span>
             </div>
         </div>
     </div>
