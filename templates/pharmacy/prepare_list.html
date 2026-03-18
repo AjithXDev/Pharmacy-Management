@@ -44,16 +44,22 @@
                     </div>
                 </td>
 
-                <td style="padding: 16px 24px;">
-                    <div style="font-size: 13px;">
-                        <div style="color: var(--text-main); font-weight: 600;">
-                            Start: {% if prep.start_time %}{{ prep.start_time|time:"H:i" }}{% else %}-{% endif %}
-                        </div>
-                        <div style="color: #6366f1; font-size: 11px; font-weight: 700; margin-top: 2px;">
-                            Est. Disp: {% if prep.expected_dispatch_time %}{{ prep.expected_dispatch_time|time:"H:i" }}{% else %}-{% endif %}
-                        </div>
-                    </div>
-                </td>
+                <td style="padding: 16px 24px;"
+    class="dispatch-timer"
+    data-exp="{% if prep.expected_dispatch_time %}{{ prep.expected_dispatch_time|time:'H:i:s' }}{% endif %}"
+    data-prep-id="{{ prep.id }}">
+
+    <div style="font-size: 13px;">
+        <div style="color: var(--text-main); font-weight: 600;">
+            Start: {% if prep.start_time %}{{ prep.start_time|time:"H:i" }}{% else %}-{% endif %}
+        </div>
+
+        <div style="color: #6366f1; font-size: 11px; font-weight: 700; margin-top: 2px;">
+            Est. Disp: {% if prep.expected_dispatch_time %}{{ prep.expected_dispatch_time|time:"H:i" }}{% else %}-{% endif %}
+        </div>
+    </div>
+
+</td>
 
                 <td style="padding: 16px 24px;">
                     {% if prep.actual_prepare_time %}
@@ -131,4 +137,38 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 </style>
+
+<script>
+
+function checkDispatchTime(){
+
+    let rows = document.querySelectorAll(".dispatch-timer");
+
+    rows.forEach(row => {
+
+        let expTime = row.dataset.exp;
+        let prepId = row.dataset.prepId;
+
+        if(!expTime) return;
+
+        let now = new Date();
+
+        let [h,m,s] = expTime.split(":");
+
+        let exp = new Date();
+        exp.setHours(h);
+        exp.setMinutes(m);
+        exp.setSeconds(s);
+
+        if(now >= exp){
+            window.location.href = "/pharmacy/finish/" + prepId + "/";
+        }
+
+    });
+
+}
+
+setInterval(checkDispatchTime,5000);
+
+</script>
 {% endblock %}

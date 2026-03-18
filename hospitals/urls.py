@@ -24,5 +24,10 @@ urlpatterns = [
     path("pharmacy-head/remove/<int:user_id>/",views.remove_pharmacy_head,name="remove_pharmacy_head"),
     path("pharmacy-head/create/<int:pharmacy_id>/",views.create_pharmacy_head,name="create_pharmacy_head"),
     path("create-reception/", views.create_reception_staff, name="create_reception"),
+    path(
+        "add-pharmacist/",
+        views.add_pharmacist,
+        name="add_pharmacist"
+    ),
     
 ]

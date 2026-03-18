@@ -4,3 +4,5 @@ migrations/
 db.sqlite3
 simulation_output.csv
 ml_models/
+Documents/
+.env

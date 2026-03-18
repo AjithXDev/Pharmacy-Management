@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 
 
@@ -58,6 +60,12 @@ class Pharmacy(models.Model):
         return f"{self.name} - {self.hospital.name}"
 
 
+class Pharmacist(models.Model):
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
 class Counter(models.Model):
     pharmacy = models.ForeignKey(
         "hospitals.Pharmacy",

@@ -552,3 +552,37 @@ def create_reception_staff(request):
         return redirect("hospital_dashboard")
 
     return render(request, "hospitals/create_reception.html")
+
+
+def add_pharmacist(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        pharmacy_id = request.POST.get("pharmacy")
+
+        pharmacy = Pharmacy.objects.get(id=pharmacy_id)
+
+        User.objects.create_user(
+
+            username=username,
+            password=password,
+            role="PHARMACIST",
+            hospital=request.user.hospital,
+            pharmacy=pharmacy
+        )
+
+        messages.success(request, "Pharmacist created successfully")
+
+        return redirect("hospital_dashboard")
+
+    pharmacies = Pharmacy.objects.filter(
+        hospital=request.user.hospital
+    )
+
+    return render(
+        request,
+        "hospitals/add_pharmacist.html",
+        {"pharmacies": pharmacies}
+    )

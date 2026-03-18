@@ -32,6 +32,8 @@ def login_view(request):
             
             elif user.role == 'RECEPTION_STAFF':
                 return redirect('reception_dashboard')
+            elif user.role == 'PHARMACIST':
+                return redirect('pharmacist_dashboard')
 
             else:
                 messages.error(request, "Role not assigned properly.")

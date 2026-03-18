@@ -5,7 +5,8 @@ from reception.models import *
 from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Sum
-
+from reception.utils import send_medicine_ready_sms
+from django.utils import timezone
 from reception.models import Token, PrescriptionItem
 from reception.ml_predict import predict_billing_time
 
@@ -179,18 +180,28 @@ def complete_billing(request, token_id):
     token = get_object_or_404(Token, id=token_id)
     counter = token.counter
 
+    # billing completed
     token.status = "COMPLETED"
     token.counter = None
     token.save()
 
+    # free billing counter
     if counter:
         counter.is_busy = False
         counter.save()
-    
+
+    # 🔥 CREATE PREPARATION FOR PHARMACIST
+    if token.prescription:
+
+        Preparation.objects.create(
+            token=token,
+            medicine_count=token.prescription.items.count(),
+            status="PENDING"
+        )
+
     recalculate_queue(token.pharmacy)
 
     return redirect("counter_list")
-
 
 # 🔹 Toggle Counter
 @login_required
@@ -325,15 +336,26 @@ def finish_prepare(request, prep_id):
 
     prep = get_object_or_404(Preparation, id=prep_id)
 
-    prep.status = "DISPATCHED"
-    prep.end_time = timezone.now()
+    prep.status = "DONE"
+    prep.finish_time = timezone.now()
 
     if prep.start_time:
-        prep.actual_prepare_time = (
-            prep.end_time - prep.start_time
-        ).total_seconds() / 60
+        diff = prep.finish_time - prep.start_time
+        prep.actual_prepare_time = diff.total_seconds() / 60
 
     prep.save()
+
+    token = prep.token
+    patient = token.patient
+
+    dispatch_time = timezone.localtime(prep.finish_time).strftime("%H:%M")
+
+    # 🔹 SEND MEDICINE READY SMS
+    send_medicine_ready_sms(
+        patient.phone,
+        token.token_number,
+        dispatch_time
+    )
 
     return redirect("prepare_list")
 

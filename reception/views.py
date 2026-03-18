@@ -1,3 +1,4 @@
+from email.utils import localtime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Max
 from django.contrib.auth.decorators import login_required
@@ -12,8 +13,15 @@ from datetime import timedelta
 import math
 from pharmacy.views import *
 from .ml_predict import predict_billing_time
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Max
 
+from .models import Prescription, Pharmacy, Token, PrescriptionItem, Counter
 
+from .utils import send_token_sms   # 🔹 SMS function import
 
 
 @login_required
@@ -49,25 +57,22 @@ def generate_token(request, prescription_id, pharmacy_id):
     if last_token["token_number__max"]:
         next_number = last_token["token_number__max"] + 1
 
-
-    # 🔹 Queue length (patients waiting before this token)
+    # 🔹 Queue length
     waiting_count = Token.objects.filter(
         pharmacy=pharmacy,
-        status="WAITING"
+        token_number__lt=next_number,
+        status__in=["WAITING", "BILLING"]
     ).count()
 
-
-    # 🔹 Medicine count from prescription
+    # 🔹 Medicine count
     medicine_count = PrescriptionItem.objects.filter(
         prescription=prescription
     ).count()
 
-
-    # 🔹 Default ML features (can improve later)
+    # 🔹 Default ML features
     test_count = 0
     payment_type = 0
     emergency = 0
-
 
     # 🔹 Active counters
     active_counters = Counter.objects.filter(
@@ -77,7 +82,6 @@ def generate_token(request, prescription_id, pharmacy_id):
 
     if active_counters == 0:
         active_counters = 1
-
 
     # 🔹 ML billing time prediction
     billing_time = predict_billing_time(
@@ -89,17 +93,15 @@ def generate_token(request, prescription_id, pharmacy_id):
         emergency
     )
 
+    # 🔹 Current time
+    current_time = timezone.localtime()
 
-    # 🔹 Total wait seconds
-    queue_batches = math.ceil(waiting_count / active_counters)
-
-    expected_wait_seconds = (queue_batches * billing_time) + billing_time
-
-    # 🔹 Expected billing start time
-    expected_billing_time = timezone.now() + timedelta(
-        seconds=expected_wait_seconds
-    )
-
+    # 🔹 Expected billing time
+    if waiting_count == 0:
+        expected_billing_time = current_time
+    else:
+        expected_wait_seconds = (waiting_count * billing_time) / active_counters
+        expected_billing_time = current_time + timedelta(seconds=expected_wait_seconds)
 
     # 🔹 Create token
     token = Token.objects.create(
@@ -112,12 +114,17 @@ def generate_token(request, prescription_id, pharmacy_id):
         billing_expected_time=expected_billing_time
     )
 
+    # 🔹 SEND SMS TO PATIENT
+    send_token_sms(
+        patient.phone,
+        token.token_number,
+        expected_billing_time.strftime("%H:%M")
+    )
 
-    # 🔹 Optional queue recalculation
+    # 🔹 Recalculate queue
     recalculate_queue(pharmacy)
 
-
-    # 🔹 Debug logs (for development)
+    # 🔹 Debug logs
     print("------ TOKEN CREATED ------")
     print("Token Number:", token.token_number)
     print("Medicine Count:", medicine_count)
@@ -127,9 +134,8 @@ def generate_token(request, prescription_id, pharmacy_id):
     print("Expected Billing Time:", expected_billing_time)
     print("---------------------------")
 
-
     return redirect("token_success", token_id=token.id)
-    
+
 @login_required
 def reception_dashboard(request):
 
@@ -179,9 +185,16 @@ def token_success(request, token_id):
 
     token = get_object_or_404(Token, id=token_id)
 
+    queue_ahead = Token.objects.filter(
+        pharmacy=token.pharmacy,
+        token_number__lt=token.token_number,
+        status__in=["WAITING", "BILLING"]
+    ).count()
+
     context = {
         "token": token,
-        "expected_billing_time": token.billing_expected_time
+        "expected_billing_time": token.billing_expected_time,
+        "queue_ahead": queue_ahead
     }
 
     return render(request, "reception/token_success.html", context)

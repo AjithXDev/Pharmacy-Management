@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Pharmacist Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:40px;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+button{
+padding:6px 12px;
+background:#2c7be5;
+color:white;
+border:none;
+border-radius:5px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Pharmacist Dashboard</h2>
+
+<div class="card">
+
+<p><b>Waiting Prescriptions :</b> {{waiting}}</p>
+
+<p><b>Dispatched Medicines :</b> {{dispatched}}</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Currently Preparing</h3>
+
+<table>
+
+<tr>
+<th>Token</th>
+<th>Patient</th>
+<th>Start Time</th>
+<th>Action</th>
+</tr>
+
+{% for prep in preparing %}
+
+<tr>
+
+<td>{{prep.token.token_number}}</td>
+
+<td>{{prep.token.patient.name}}</td>
+
+<td>{{prep.start_time}}</td>
+
+<td>
+
+<a href="/pharmacist/dispatch/{{prep.token.id}}/">
+
+<button>Dispatch</button>
+
+</a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+
+<div class="card">
+
+<h3>Recent Dispatch</h3>
+
+<table>
+
+<tr>
+<th>Token</th>
+<th>Patient</th>
+<th>Dispatch Time</th>
+</tr>
+
+{% for prep in recent_dispatch %}
+
+<tr>
+
+<td>{{prep.token.token_number}}</td>
+
+<td>{{prep.token.patient.name}}</td>
+
+<td>{{prep.end_time}}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from hospitals.models import Hospital, Pharmacy   
+from hospitals.models import *  
 
 
 class User(AbstractUser):
